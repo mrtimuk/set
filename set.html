@@ -89,8 +89,9 @@ for (var i = 0; i < 3; i++)
     elCard.id = 'c' + j + i;
     elCard.setAttributeNS(null, "transform", "translate(" + (j * 50) + " " + (i * 85) + ")");
     
-    elCard.addEventListener('click', createClickHandler(j,i), false);
-		elBoard.appendChild(elCard);
+	elCard.addEventListener('click', createClickHandler(j,i), false);
+    elCard.addEventListener('touchend', createClickHandler(j,i), false);
+	elBoard.appendChild(elCard);
 	}
 
 var colours = ['red', 'green', 'blue'];
@@ -117,11 +118,12 @@ for (var i = 0; i < 4; i++)
   board[i] = new Array(3);
 
 function createClickHandler(x, y) {
-  return function() { cardClicked(x,y); }
+  return function(evt) { cardClicked(x,y); if (evt.type=='touchend') evt.preventDefault(); }
 }
 
 var elSet = document.getElementById('elSet');
 var elNSets = document.getElementById('elNSets');
+var elSelected = document.getElementById('elSelected');
 var nSets = 0;
 function cardClicked(x,y) {
   if (board[x][y] != null)
@@ -133,7 +135,7 @@ function cardClicked(x,y) {
     else selections.splice(selections.indexOf(board[x][y]), 1);
     
     var selected = selections.length;
-    document.getElementById('elSelected').innerHTML = 
+    elSelected.innerHTML = 
       (selected < 3 ? ("Select " + (3 - selected) + " card" + (selected != 2 ? "s" : "")) :
       selected > 3 ? ("Unselect " + (selected - 3) + " card" + (selected != 4 ? "s" : "")) :
       "" ) + "<br>";
@@ -142,7 +144,7 @@ function cardClicked(x,y) {
     if (check.set)
     {
       nSets++;
-      elNSets.innerHTML = 'You have ' + nSets + " set" + (nSets > 1 ? 's' : '');
+      elNSets.innerHTML = 'You have ' + nSets + " set" + (nSets > 1 ? 's' : '') + " out of 27";
       elSet.style.display = 'block';
       setTimeout(function() {
         elSet.style.display = 'none';
@@ -274,11 +276,27 @@ function updateBoard()
 		  drawCard(document.getElementById('c' + j + i), board[j][i]);
 }
 
+function updateHints()
+{
+
+}
+
 function deal()
 {
-  document.getElementById('elDeal').style.display = 'none';
+	if (nSets > 0 &&
+		!confirm("Whoa - are you sure you want to start again?"))
+			return;
+
+	selections = [];
+	nSets = 0;
+	shuffle();
+	for (var x = 0; x < 4; x++)
+		for (var y = 0; y < 3; y++)
+			board[x][y] = null;
 	dealSpaces();
 	updateBoard();
+
+	document.getElementById('elDeal').innerHTML = "Start again";
 }
 
 shuffle();
