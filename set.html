@@ -2,315 +2,83 @@
 <html>
 <head>
   <meta charset="utf-8"/>
-  <style>
-  .footer {
-    clear:both;
-    text-align:center;
-    font-size: 80%;
-  }
-  #svgBoard { 
-    float: left;
-  }
-  h1 {
-  	margin: 0px;
-  }
-  #elSet {
-    display:none;
-    position:absolute;
-    width:400px;height:400px;
-    text-align:center;
-    padding-top:200px;
-    font-size:72pt;
-    font-weight:bold;
-    text-shadow:0px 0px 10px #fff;
-    opacity:0.8
-  }
-  </style>
+  <link href="bootstrap.min.css" rel="stylesheet">
+  <link href="bootstrap-responsive.min.css" rel="stylesheet">
+  <link href="set.css" rel="stylesheet">
 </head>
 
-<h1>Set</h1>
+<body>
+<div id="wrap">
+  <div class="navbar navbar-fixed-top">
+    <div class="navbar-inner"> 
+      <div class="container"> 
+        <a class="brand" href="#">Set</a>
+      </div>
+    </div>
+  </div>
 
-<svg id="svgBoard" version="1.1" xmlns="http://www.w3.org/2000/svg" 
-     xmlns:xlink="http://www.w3.org/1999/xlink"
-     width="440px" height="510px" viewBox="0 0 220 255">
-<defs>
-  <symbol id="diamond" viewBox="0 0 40 20">
-    <path d="M20,1 l-19,9 19,9 19,-9z"/>
-  </symbol>
+  <div class="container">
 
-  <symbol id="sausage" viewBox="0 0 40 20">
-    <path d="M11,2 l19,0 a8,8 0 0 1 0,16 l-19,0 a8,8 0 0 1 0,-16"/>
-  </symbol>
+    <svg id="svgBoard" version="1.1" xmlns="http://www.w3.org/2000/svg" 
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         width="600px" height="510px" viewBox="0 0 300 255">
+    <defs>
+      <symbol id="diamond" viewBox="0 0 40 20">
+        <path d="M20,1 l-19,9 19,9 19,-9z" />
+      </symbol>
 
-  <symbol id="wotsit" viewBox="0 0 40 20">
-    <path d="M10,2 c9,-4 11,4 20,0 s9,14 0,16 s-11,-4 -20,0 s-9,-14 0,-16"/>
-  </symbol>
+      <symbol id="sausage" viewBox="0 0 40 20">
+        <path d="M11,2 l19,0 a8,8 0 0 1 0,16 l-19,0 a8,8 0 0 1 0,-16" />
+      </symbol>
 
-  <symbol id="card" viewBox="0 0 50 85">
-    <path d="M6,1 l38,0 a5,5 0 0 1 5,5 l0,73 a5,5 0 0 1 -5,5 l-38,0
-    	a5,5 0 0 1 -5,-5 l0,-73 a5,5 0 0 1 5,-5" 
-      stroke="gray">
-  </symbol>
+      <symbol id="wotsit" viewBox="0 0 40 20">
+        <path d="M10,2 c9,-4 11,4 20,0 s9,14 0,16 s-11,-4 -20,0 s-9,-14 0,-16" />
+      </symbol>
 
-  <pattern id="redHatched" patternUnits="userSpaceOnUse" width="4" height="4">
-  	<path d="M-1,1 l2,-2M0,4 l4,-4M3,5 l2,-2" stroke="red" stroke-width="0.5"/>
-  </pattern>
+      <symbol id="card" viewBox="0 0 50 85">
+        <path d="M6,1 l38,0 a5,5 0 0 1 5,5 l0,73 a5,5 0 0 1 -5,5 l-38,0
+        	a5,5 0 0 1 -5,-5 l0,-73 a5,5 0 0 1 5,-5" 
+          stroke="gray" />
+      </symbol>
 
-  <pattern id="greenHatched" patternUnits="userSpaceOnUse" width="4" height="4">
-  	<path d="M-1,1 l2,-2M0,4 l4,-4M3,5 l2,-2" stroke="green" stroke-width="0.5"/>
-  </pattern>
+      <pattern id="redHatched" patternUnits="userSpaceOnUse" width="4" height="4">
+      	<path d="M-1,1 l2,-2M0,4 l4,-4M3,5 l2,-2" stroke="red" stroke-width="0.5" />
+      </pattern>
 
-  <pattern id="blueHatched" patternUnits="userSpaceOnUse" width="4" height="4">
-  	<path d="M-1,1 l2,-2M0,4 l4,-4M3,5 l2,-2" stroke="blue" stroke-width="0.5"/>
-  </pattern>
-</defs>
-</svg>
-<div id="elSet">Set!</div>
+      <pattern id="greenHatched" patternUnits="userSpaceOnUse" width="4" height="4">
+      	<path d="M-1,1 l2,-2M0,4 l4,-4M3,5 l2,-2" stroke="green" stroke-width="0.5" />
+      </pattern>
 
-<h2>How to play</h2>
-<p>You must pick three cards which form a set.
-Each card has a colour, a shape, a number of shapes, and a pattern.
-For each of these properties, all the cards in the set must be unique or identical.</p>
+      <pattern id="blueHatched" patternUnits="userSpaceOnUse" width="4" height="4">
+      	<path d="M-1,1 l2,-2M0,4 l4,-4M3,5 l2,-2" stroke="blue" stroke-width="0.5" />
+      </pattern>
+    </defs>
+    </svg>
+    <div id="elSet">Set!</div>
 
-<p><span id="elSelected">Deal, then select 3 cards - go!</span></p>
+    <h2>How to play</h2>
+    <p>Pick three cards which form a set.
+    Each card has a colour, a shape, a number of shapes, and a pattern;
+    for each of these properties all the cards in the set must either be unique or identical.</p>
 
-<p><span id="elNSets"></span></p>
+    <p><span id="elInstructions">Deal, then select 3 cards - go!</span></p>
 
-<script>
-var svgns = "http://www.w3.org/2000/svg";
-var xlinkns = "http://www.w3.org/1999/xlink";
+    <p><span id="elNSets"></span></p>
 
-// Set up the board with card spaces
-var elBoard = document.getElementById('svgBoard');
-for (var i = 0; i < 3; i++)
-	for (var j = 0; j < 4; j++)
-	{
-    var elCard = document.createElementNS(svgns, 'g');
-    elCard.id = 'c' + j + i;
-    elCard.setAttributeNS(null, "transform", "translate(" + (j * 50) + " " + (i * 85) + ")");
-    
-	elCard.addEventListener('click', createClickHandler(j,i), false);
-    elCard.addEventListener('touchend', createClickHandler(j,i), false);
-	elBoard.appendChild(elCard);
-	}
+    <button class="btn btn-large btn-primary" id="elDeal" onclick="return deal();">Deal</button>
 
-var colours = ['red', 'green', 'blue'];
-var shapes = ['wotsit', 'sausage', 'diamond'];
-var fills = ['empty', 'hatched', 'solid'];
-var properties = ['colour', 'shape', 'number', 'fill'];
+    <!-- Affiliate link -->
+    <div style="margin-top:140px">
+    <p><a href="http://www.amazon.co.uk/gp/product/B00000IV34/ref=as_li_tf_tl?ie=UTF8&camp=1634&creative=6738&creativeASIN=B00000IV34&linkCode=as2&tag=valutica-21">
+        <img border="0" src="http://ws-eu.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B00000IV34&Format=_SL110_&ID=AsinImage&MarketPlace=GB&ServiceVersion=20070822&WS=1&tag=valutica-21" style="margin-top:-40px; float: left;">Get SET the card game<br>from Amazon</a><img src="http://ir-uk.amazon-adsystem.com/e/ir?t=valutica-21&l=as2&o=2&a=B00000IV34" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" /></p>
+    </div>
 
-// Create the deck: 3 shapes, 3 colours, 3 numbers, 3 gradents = 81 cards
-var deck = new Array(81);
-for (var i = 0; i < 81; i++)
-{
-	var colour = colours[Math.floor(i / 27)];
-	var shape = shapes[Math.floor(i / 9) % 3]
-	var fill = fills[Math.floor(i / 3) % 3];
-	var number = i % 3;
-	deck[i] = { colour: colour, shape: shape, fill: fill, number: number };
-}
-var deckPointer = 0;
-var selections = [];
-
-// Create the board
-var board = new Array(4);
-for (var i = 0; i < 4; i++)
-  board[i] = new Array(3);
-
-function createClickHandler(x, y) {
-  return function(evt) { cardClicked(x,y); if (evt.type=='touchend') evt.preventDefault(); }
-}
-
-var elSet = document.getElementById('elSet');
-var elNSets = document.getElementById('elNSets');
-var elSelected = document.getElementById('elSelected');
-var nSets = 0;
-function cardClicked(x,y) {
-  if (board[x][y] != null)
-  {
-    board[x][y].selected = !board[x][y].selected;
-    drawCard(document.getElementById('c' + x + y), board[x][y]);
-    
-    if (board[x][y].selected) selections.push(board[x][y]);
-    else selections.splice(selections.indexOf(board[x][y]), 1);
-    
-    var selected = selections.length;
-    elSelected.innerHTML = 
-      (selected < 3 ? ("Select " + (3 - selected) + " card" + (selected != 2 ? "s" : "")) :
-      selected > 3 ? ("Unselect " + (selected - 3) + " card" + (selected != 4 ? "s" : "")) :
-      "" ) + "<br>";
-    
-    var check = checkCombo();
-    if (check.set)
-    {
-      nSets++;
-      elNSets.innerHTML = 'You have ' + nSets + " set" + (nSets > 1 ? 's' : '') + " out of 27";
-      elSet.style.display = 'block';
-      setTimeout(function() {
-        elSet.style.display = 'none';
-
-        // Remove the set and deal
-        for (var x = 0; x < 4; x++)
-          for (var y = 0; y < 3; y++)
-            if (board[x][y].selected)
-            {
-              board[x][y] = null;
-            }
-        selections = [];
-        dealSpaces();
-        updateBoard();
-      }, 1000);
-    }
-    else 
-      elSelected.innerHTML += check.reason;
-  }
-}
-
-function uniqueProperty(prop, index)
-{
-  for (var i = 0; i < index; i++)
-    if (selections[i].card[prop] == selections[index].card[prop]) 
-      {
-        //alert ('Card ' + (index+1) + '('+ selections[index].card[prop] +') is the same as card ' + 
-        //  (i+1) + '(' + selections[i].card[prop] + ')');
-        return false;
-      }
-  return true;
-}
-
-function identicalProperty(prop, index)
-{
-  return (selections[0].card[prop] == selections[index].card[prop]);
-}
-
-function checkCombo()
-{
-  if (selections.length < 2)
-    return { set:false, reason:'' };
-  
-  var ret = { set: selections.length == 3, reason:'' };
-  for (var ip = 0; ip < properties.length; ip++)
-  {
-    var prop = properties[ip];
-    var firstPair = selections[0].card[prop] == selections[1].card[prop] ? "identical" : "unique";
-  
-    for (var is = 2; is < selections.length; is++)
-    {
-      if (!window[firstPair + 'Property'](prop, is))
-      {
-        ret.set = false;
-        ret.reason += 'The ' + prop + 's are neither unique nor identical<br>';
-      }
-    }
-  }
-  return ret;
-}
-
-function shuffle()
-{
-  for (var i = deck.length - 1; i >= 1; i--)
-  {
-    var j = Math.floor(Math.random() * i);
-    var temp = deck[i];
-    deck[i] = deck[j];
-    deck[j] = temp;
-  }
-  deckPointer = 0;
-}
-
-function dealSpaces()
-{
-  if (deckPointer >= 81) return;
-  for (var i = 0; i < 3; i++)
-  	for (var j = 0; j < 4; j++)
-  		if (board[j][i] == null)
-      {
-  			board[j][i] = { card: deck[deckPointer++], selected: false };
-        if (deckPointer >= 81) return;
-      }
-}
-
-// Draw card
-function drawCard(svgEl, mdlCard)
-{
-    // Remove previous card
-    svgEl.innerHTML = "";
-    if (mdlCard == null) return;
-
-    // Draw outline
-    var svgOutline = document.createElementNS(svgns, 'use');
-    svgOutline.setAttributeNS(xlinkns, "xlink:href", "#card");
-    svgOutline.setAttributeNS(null, "width", 50);
-    svgOutline.setAttributeNS(null, "height", 85);
-    svgOutline.setAttributeNS(null, "fill", 
-        mdlCard.selected ? "khaki" : "white");
-    svgEl.appendChild(svgOutline);
-
-    // Draw shapes
-    var card = mdlCard.card;
-    var top = 32.5 - card.number * 12.5;
-    for (var i = 0; i <= card.number; i++)
-    {
-      var svgSym = document.createElementNS(svgns, 'use');
-      svgSym.setAttributeNS(xlinkns, "xlink:href", "#" + card.shape);
-      svgSym.setAttributeNS(null, "stroke", card.colour);
-      svgSym.setAttributeNS(null, "width", 40);
-      svgSym.setAttributeNS(null, "height", 20);
-      svgSym.setAttributeNS(null, "x", 5);      
-      svgSym.setAttributeNS(null, "y", top + i * 25);
-      
-      svgSym.setAttributeNS(null, "fill", 
-        card.fill == "empty" ? "none" :
-        card.fill == "solid" ? card.colour :
-        "url(#" + card.colour + "Hatched)");
-
-      svgEl.appendChild(svgSym);
-    }
-}
-
-// Redraw board
-function updateBoard()
-{
-  for (var i = 0; i < 3; i++)
-  	for (var j = 0; j < 4; j++)
-		  drawCard(document.getElementById('c' + j + i), board[j][i]);
-}
-
-function updateHints()
-{
-
-}
-
-function deal()
-{
-	if (nSets > 0 &&
-		!confirm("Whoa - are you sure you want to start again?"))
-			return;
-
-	selections = [];
-	nSets = 0;
-	shuffle();
-	for (var x = 0; x < 4; x++)
-		for (var y = 0; y < 3; y++)
-			board[x][y] = null;
-	dealSpaces();
-	updateBoard();
-
-	document.getElementById('elDeal').innerHTML = "Start again";
-}
-
-shuffle();
-
-// Googly charts
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-  ga('create', 'UA-43628938-1', 'valutica.co.uk');
-  ga('send', 'pageview');
-</script>
-
-<button id="elDeal" onclick="return deal();">Deal</button>
-
-<div class="footer"><img src="valutica_clear.png" width="100px"></div>
+  </div><!-- container -->
+  <div id="push"></div>
+</div><!-- wrap -->
+<footer><img src="valutica_clear.png"></footer>
+<script src="set.js"></script>
+<script src="jquery-1.9.1.min.js"></script>
+<script src="bootstrap.min.js"></script>
+</body>
 </html>
