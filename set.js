@@ -15,7 +15,7 @@ view:
 
 var svgns = "http://www.w3.org/2000/svg";
 var xlinkns = "http://www.w3.org/1999/xlink";
-
+var possibleSets = 0;
 
 // Set up the board with card spaces
 var elBoard = document.getElementById('svgBoard');
@@ -77,7 +77,7 @@ function cardClicked(x,y) {
       selected > 3 ? ("Unselect " + (selected - 3) + " card" + (selected != 4 ? "s" : "")) :
       "" ) + "<br>";
     
-    var check = checkCombo();
+    var check = checkCombo(selections);
     if (check.set)
     {
       nSets++;
@@ -103,37 +103,37 @@ function cardClicked(x,y) {
   }
 }
 
-function uniqueProperty(prop, index)
+function uniqueProperty(prop, combo, index)
 {
   for (var i = 0; i < index; i++)
-    if (selections[i].card[prop] == selections[index].card[prop]) 
+    if (combo[i].card[prop] == combo[index].card[prop]) 
       {
-        //alert ('Card ' + (index+1) + '('+ selections[index].card[prop] +') is the same as card ' + 
-        //  (i+1) + '(' + selections[i].card[prop] + ')');
+        //alert ('Card ' + (index+1) + '('+ combo[index].card[prop] +') is the same as card ' + 
+        //  (i+1) + '(' + combo[i].card[prop] + ')');
         return false;
       }
   return true;
 }
 
-function identicalProperty(prop, index)
+function identicalProperty(prop, combo, index)
 {
-  return (selections[0].card[prop] == selections[index].card[prop]);
+  return (combo[0].card[prop] == combo[index].card[prop]);
 }
 
-function checkCombo()
+function checkCombo(combo)
 {
-  if (selections.length < 2)
+  if (combo.length < 2) // firstPair reqs len > 1
     return { set:false, reason:'' };
   
-  var ret = { set: selections.length == 3, reason:'' };
+  var ret = { set: combo.length == 3, reason:'' };
   for (var ip = 0; ip < properties.length; ip++)
   {
     var prop = properties[ip];
-    var firstPair = selections[0].card[prop] == selections[1].card[prop] ? "identical" : "unique";
+    var firstPair = combo[0].card[prop] == combo[1].card[prop] ? "identical" : "unique";
   
-    for (var is = 2; is < selections.length; is++)
+    for (var is = 2; is < combo.length; is++)
     {
-      if (!window[firstPair + 'Property'](prop, is))
+      if (!window[firstPair + 'Property'](prop, combo, is))
       {
         ret.set = false;
         ret.reason += 'The ' + prop + 's are neither unique nor identical<br>';
@@ -141,6 +141,38 @@ function checkCombo()
     }
   }
   return ret;
+}
+
+function countSets()
+{
+  var setsfound = [];
+  for (var i = 0; i < 12; i++)
+  {
+    var icard = board[i % 4][Math.floor(i / 4) % 3];
+    if (icard == null)
+      continue;
+    for (var j = i + 1; j < 12; j++)
+    {
+      var jcard = board[j % 4][Math.floor(j / 4) % 3];
+      if (jcard == null)
+        continue;
+      for (var k = j + 1; k < 12; k++)
+      {
+        var kcard = board[k % 4][Math.floor(k / 4) % 3];
+        if (kcard == null)
+          continue;
+        if (checkCombo([icard, jcard, kcard]).set)
+          setsfound.push([icard.card, jcard.card, kcard.card]);
+      }
+    }
+  }
+  possibleSets = setsfound.length;
+  return setsfound;
+}
+
+function describeCard(card)
+{
+  return (card.number+1) + " " + card.colour  + " " + card.fill + " " + card.shape;
 }
 
 function shuffle()
@@ -157,6 +189,9 @@ function shuffle()
 
 function dealSpaces()
 {
+  document.getElementById('elPossibleSets').innerHTML = "";
+  possibleSets = 0;
+
   if (deckPointer >= 81) return;
   for (var i = 0; i < 3; i++)
   	for (var j = 0; j < 4; j++)
@@ -166,10 +201,13 @@ function dealSpaces()
         setTimeout(function() {
           drawCard(document.getElementById('c' + j + i), board[j][i]);
           dealSpaces();
-        }, 100);
+        }, 80);
         return;
-        //if (deckPointer >= 81) return;
       }
+  var sets = countSets();
+  document.getElementById('elPossibleSets').innerHTML = "There are " + sets.length + " possible sets in this grid<br>";
+  //for (i = 0; i < sets.length; i++)
+  //  document.getElementById('elPossibleSets').innerHTML += describeCard(sets[i][0]) + ", " + describeCard(sets[i][1]) + " and " + describeCard(sets[i][2]) + "<br>";
 }
 
 // Draw card
@@ -228,7 +266,7 @@ function updateHints()
 
 function deal()
 {
-	if (nSets > 0 &&
+	if (nSets > 0 && possibleSets > 0 &&
 		!confirm("Whoa - are you sure you want to start again?"))
 			return;
 
