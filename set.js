@@ -89,10 +89,8 @@ function cardClicked(x,y) {
         // Remove the set and deal
         for (var x = 0; x < 4; x++)
           for (var y = 0; y < 3; y++)
-            if (board[x][y].selected)
-            {
+            if (board[x][y] != null && board[x][y].selected)
               board[x][y] = null;
-            }
         selections = [];
         dealSpaces();
         updateBoard();
@@ -192,18 +190,18 @@ function dealSpaces()
   document.getElementById('elPossibleSets').innerHTML = "";
   possibleSets = 0;
 
-  if (deckPointer >= 81) return;
-  for (var i = 0; i < 3; i++)
-  	for (var j = 0; j < 4; j++)
-  		if (board[j][i] == null)
-      {
-  			board[j][i] = { card: deck[deckPointer++], selected: false };
-        setTimeout(function() {
-          drawCard(document.getElementById('c' + j + i), board[j][i]);
-          dealSpaces();
-        }, 80);
-        return;
-      }
+  if (deckPointer < 81) 
+    for (var i = 0; i < 3; i++)
+    	for (var j = 0; j < 4; j++)
+    		if (board[j][i] == null)
+        {
+    			board[j][i] = { card: deck[deckPointer++], selected: false };
+          setTimeout(function() {
+            drawCard(document.getElementById('c' + j + i), board[j][i]);
+            dealSpaces();
+          }, 80);
+          return;
+        }
   var sets = countSets();
   document.getElementById('elPossibleSets').innerHTML = "There are " + sets.length + " possible sets in this grid<br>";
   //for (i = 0; i < sets.length; i++)
