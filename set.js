@@ -17,10 +17,13 @@ var svgns = "http://www.w3.org/2000/svg";
 var xlinkns = "http://www.w3.org/1999/xlink";
 var possibleSets = 0;
 
+var boardWidth = 5;
+var boardHeight = 3;
+
 // Set up the board with card spaces
 var elBoard = document.getElementById('svgBoard');
-for (var i = 0; i < 3; i++)
-	for (var j = 0; j < 4; j++)
+for (var i = 0; i < boardHeight; i++)
+	for (var j = 0; j < boardWidth; j++)
 	{
     var elCard = document.createElementNS(svgns, 'g');
     elCard.id = 'c' + j + i;
@@ -34,25 +37,26 @@ for (var i = 0; i < 3; i++)
 var colours = ['red', 'green', 'blue'];
 var shapes = ['wotsit', 'sausage', 'diamond'];
 var fills = ['empty', 'hatched', 'solid'];
+var maxNumber = 3;
 var properties = ['colour', 'shape', 'number', 'fill'];
 
 // Create the deck: 3 shapes, 3 colours, 3 numbers, 3 gradents = 81 cards
-var deck = new Array(81);
-for (var i = 0; i < 81; i++)
+var deck = new Array(maxNumber * fills.length * shapes.length * colours.length);
+for (var i = 0; i < deck.length; i++)
 {
-	var colour = colours[Math.floor(i / 27)];
-	var shape = shapes[Math.floor(i / 9) % 3]
-	var fill = fills[Math.floor(i / 3) % 3];
-	var number = i % 3;
+	var colour = colours[Math.floor(i / (maxNumber * fills.length * shapes.length))];
+	var shape = shapes[Math.floor(i / (maxNumber * fills.length)) % shapes.length]
+	var fill = fills[Math.floor(i / maxNumber) % fills.length];
+	var number = i % maxNumber;
 	deck[i] = { colour: colour, shape: shape, fill: fill, number: number };
 }
 var deckPointer = 0;
 var selections = [];
 
 // Create the board
-var board = new Array(4);
-for (var i = 0; i < 4; i++)
-  board[i] = new Array(3);
+var board = new Array(boardWidth);
+for (var i = 0; i < board.length; i++)
+  board[i] = new Array(boardHeight);
 
 function createClickHandler(x, y) {
   return function(evt) { cardClicked(x,y); if (evt.type=='touchend') evt.preventDefault(); }
@@ -63,42 +67,42 @@ var elNSets = document.getElementById('elNSets');
 var elInstructions = document.getElementById('elInstructions');
 var nSets = 0;
 function cardClicked(x,y) {
-  if (board[x][y] != null)
-  {
-    board[x][y].selected = !board[x][y].selected;
-    drawCard(document.getElementById('c' + x + y), board[x][y]);
-    
-    if (board[x][y].selected) selections.push(board[x][y]);
-    else selections.splice(selections.indexOf(board[x][y]), 1);
-    
-    var selected = selections.length;
-    elInstructions.innerHTML = 
-      (selected < 3 ? ("Select " + (3 - selected) + " card" + (selected != 2 ? "s" : "")) :
-      selected > 3 ? ("Unselect " + (selected - 3) + " card" + (selected != 4 ? "s" : "")) :
-      "" ) + "<br>";
-    
-    var check = checkCombo(selections);
-    if (check.set)
-    {
-      nSets++;
-      updateHints();
-      elSet.style.display = 'block';
-      setTimeout(function() {
-        elSet.style.display = 'none';
+  if (board[x][y] == null)
+    return;
 
-        // Remove the set and deal
-        for (var x = 0; x < 4; x++)
-          for (var y = 0; y < 3; y++)
-            if (board[x][y] != null && board[x][y].selected)
-              board[x][y] = null;
-        selections = [];
-        dealSpaces();
-        updateBoard();
-      }, 1000);
-    }
-    else 
-      elInstructions.innerHTML += check.reason;
+  board[x][y].selected = !board[x][y].selected;
+  drawCard(document.getElementById('c' + x + y), board[x][y]);
+  
+  if (board[x][y].selected) selections.push(board[x][y]);
+  else selections.splice(selections.indexOf(board[x][y]), 1);
+  
+  var selected = selections.length;
+  elInstructions.innerHTML = 
+    (selected < 3 ? ("Select " + (3 - selected) + " card" + (selected != 2 ? "s" : "")) :
+    selected > 3 ? ("Unselect " + (selected - 3) + " card" + (selected != 4 ? "s" : "")) :
+    "" ) + "<br>";
+  
+  var check = checkCombo(selections);
+  if (check.set)
+  {
+    nSets++;
+    updateHints();
+    elSet.style.display = 'block';
+    setTimeout(function() {
+      elSet.style.display = 'none';
+
+      // Remove the set and deal
+      for (var x = 0; x < boardWidth; x++)
+        for (var y = 0; y < boardHeight; y++)
+          if (board[x][y] != null && board[x][y].selected)
+            board[x][y] = null;
+      selections = [];
+      dealSpaces();
+      updateBoard();
+    }, 1000);
   }
+  else 
+    elInstructions.innerHTML += check.reason;
 }
 
 function uniqueProperty(prop, combo, index)
@@ -144,19 +148,19 @@ function checkCombo(combo)
 function countSets()
 {
   var setsfound = [];
-  for (var i = 0; i < 12; i++)
+  for (var i = 0; i < boardWidth * boardHeight; i++)
   {
-    var icard = board[i % 4][Math.floor(i / 4) % 3];
+    var icard = board[i % boardWidth][Math.floor(i / boardWidth) % (boardHeight)];
     if (icard == null)
       continue;
-    for (var j = i + 1; j < 12; j++)
+    for (var j = i + 1; j < boardWidth * boardHeight; j++)
     {
-      var jcard = board[j % 4][Math.floor(j / 4) % 3];
+      var jcard = board[j % boardWidth][Math.floor(j / boardWidth) % (boardHeight)];
       if (jcard == null)
         continue;
-      for (var k = j + 1; k < 12; k++)
+      for (var k = j + 1; k < boardWidth * boardHeight; k++)
       {
-        var kcard = board[k % 4][Math.floor(k / 4) % 3];
+        var kcard = board[k % boardWidth][Math.floor(k / boardWidth) % (boardHeight)];
         if (kcard == null)
           continue;
         if (checkCombo([icard, jcard, kcard]).set)
@@ -194,21 +198,25 @@ function showHint()
     return;
 
   elPossibleSets.innerHTML="";
-  for (var i = 0; i <= hint; i++)
+  var i;
+  for (i = 0; i <= hint; i++)
     elPossibleSets.innerHTML += describeCard(sets[0][i])+"<br>";
   if (hint < 2)
-    elPossibleSets.innerHTML += "<a href='#hint' onClick='showHint()'>Show another hint..</button>";    
+    elPossibleSets.innerHTML += "<a href='#hint' onClick='showHint()'>Show another hint..</a><br>";
+  for (; i < 2; i++)
+    elPossibleSets.innerHTML += "<br>";
+ 
   hint++;
 }
 
 function dealSpaces()
 {
-  elPossibleSets.innerHTML = "";
+  elPossibleSets.innerHTML = "<br><br><br>";
   possibleSets = 0;
 
-  if (deckPointer < 81) 
-    for (var i = 0; i < 3; i++)
-    	for (var j = 0; j < 4; j++)
+  if (deckPointer < deck.length) 
+    for (var i = 0; i < boardHeight; i++)
+    	for (var j = 0; j < boardWidth-1; j++)
     		if (board[j][i] == null)
         {
     			board[j][i] = { card: deck[deckPointer++], selected: false };
@@ -223,9 +231,7 @@ function dealSpaces()
 
   hint = 0;
   if (sets.length > 0)
-  {
-    elPossibleSets.innerHTML += "<br><a href='#hint' onClick='showHint()'>Show a hint..</a>";
-  }
+    elPossibleSets.innerHTML += "<a href='#hint' onClick='showHint()'>Show a hint..</a><br><br>";
 
   //for (i = 0; i < sets.length; i++)
   //  document.getElementById('elPossibleSets').innerHTML += describeCard(sets[i][0]) + ", " + describeCard(sets[i][1]) + " and " + describeCard(sets[i][2]) + "<br>";
@@ -274,14 +280,14 @@ function drawCard(svgEl, mdlCard)
 // Redraw board
 function updateBoard()
 {
-  for (var i = 0; i < 3; i++)
-  	for (var j = 0; j < 4; j++)
+  for (var i = 0; i < boardHeight; i++)
+  	for (var j = 0; j < boardWidth; j++)
 		  drawCard(document.getElementById('c' + j + i), board[j][i]);
 }
 
 function updateHints()
 {
-  elNSets.innerHTML = nSets < 1 ? '' : 
+  elNSets.innerHTML = nSets < 1 ? '<br>' : 
   'You have ' + nSets + ' set' + (nSets > 1 ? 's' : '') + ' out of 27';
 }
 
@@ -296,8 +302,8 @@ function deal()
 	selections = [];
 	nSets = 0;
 	shuffle();
-	for (var x = 0; x < 4; x++)
-		for (var y = 0; y < 3; y++)
+	for (var x = 0; x < boardWidth; x++)
+		for (var y = 0; y < boardHeight; y++)
 			board[x][y] = null;
   updateBoard();
 
