@@ -170,7 +170,7 @@ function countSets()
 
 function describeCard(card)
 {
-  return (card.number+1) + " " + card.colour  + " " + card.fill + " " + card.shape;
+  return (card.number+1) + " " + card.colour  + " " + card.fill + " " + card.shape + (card.number > 0 ? 's' : '');
 }
 
 function shuffle()
@@ -185,9 +185,25 @@ function shuffle()
   deckPointer = 0;
 }
 
+var elPossibleSets = document.getElementById('elPossibleSets');
+var sets;
+var hint;
+function showHint() 
+{
+  if (sets.length == 0 || hint > 2)
+    return;
+
+  elPossibleSets.innerHTML="";
+  for (var i = 0; i <= hint; i++)
+    elPossibleSets.innerHTML += describeCard(sets[0][i])+"<br>";
+  if (hint < 2)
+    elPossibleSets.innerHTML += "<a href='#hint' onClick='showHint()'>Show another hint..</button>";    
+  hint++;
+}
+
 function dealSpaces()
 {
-  document.getElementById('elPossibleSets').innerHTML = "";
+  elPossibleSets.innerHTML = "";
   possibleSets = 0;
 
   if (deckPointer < 81) 
@@ -202,8 +218,15 @@ function dealSpaces()
           }, 80);
           return;
         }
-  var sets = countSets();
-  document.getElementById('elPossibleSets').innerHTML = "There are " + sets.length + " possible sets in this grid<br>";
+  sets = countSets();
+  elPossibleSets.innerHTML = "There are " + sets.length + " possible sets in this grid<br>";
+
+  hint = 0;
+  if (sets.length > 0)
+  {
+    elPossibleSets.innerHTML += "<br><a href='#hint' onClick='showHint()'>Show a hint..</a>";
+  }
+
   //for (i = 0; i < sets.length; i++)
   //  document.getElementById('elPossibleSets').innerHTML += describeCard(sets[i][0]) + ", " + describeCard(sets[i][1]) + " and " + describeCard(sets[i][2]) + "<br>";
 }
