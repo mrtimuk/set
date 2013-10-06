@@ -58,6 +58,15 @@ var board = new Array(boardWidth);
 for (var i = 0; i < board.length; i++)
   board[i] = new Array(boardHeight);
 
+// Scoring
+var totalPoints = 0,
+    moveTimer = 0;
+elTotalPoints = document.getElementById("points");
+function updatePoints(v) {
+  totalPoints = v;
+  elTotalPoints.innerHTML = "Points: " + totalPoints;
+}
+
 function createClickHandler(x, y) {
   return function(evt) { cardClicked(x,y); if (evt.type=='touchend') evt.preventDefault(); }
 }
@@ -88,6 +97,10 @@ function cardClicked(x,y) {
     nSets++;
     updateHints();
     elSet.style.display = 'block';
+    
+    updatePoints(totalPoints + moveTimer);
+    updateMoveTimer(0);
+
     setTimeout(function() {
       elSet.style.display = 'none';
 
@@ -197,6 +210,8 @@ function showHint()
   if (sets.length == 0 || hint > 2)
     return;
 
+  updatePoints(totalPoints - 100); 
+
   elPossibleSets.innerHTML="";
   var i;
   for (i = 0; i <= hint; i++)
@@ -207,6 +222,22 @@ function showHint()
     elPossibleSets.innerHTML += "<br>";
  
   hint++;
+}
+
+var elTimer = document.getElementById("timer");
+function updateMoveTimer(v) {
+  moveTimer = v;
+  elTimer.innerHTML = Array(moveTimer).join("|") + "<br>";
+}
+ 
+function moveTick() {
+  if (moveTimer <= 0)
+    return;
+
+  updateMoveTimer(moveTimer - 1);
+
+  if (moveTimer > 0)
+    setTimeout(moveTick, 500)
 }
 
 function dealSpaces()
@@ -231,10 +262,11 @@ function dealSpaces()
 
   hint = 0;
   if (sets.length > 0)
+  {
     elPossibleSets.innerHTML += "<a href='#hint' onClick='showHint()'>Show a hint..</a><br><br>";
-
-  //for (i = 0; i < sets.length; i++)
-  //  document.getElementById('elPossibleSets').innerHTML += describeCard(sets[i][0]) + ", " + describeCard(sets[i][1]) + " and " + describeCard(sets[i][2]) + "<br>";
+    updateMoveTimer(80);
+  }
+  moveTick();
 }
 
 // Draw card
@@ -306,6 +338,8 @@ function deal()
 		for (var y = 0; y < boardHeight; y++)
 			board[x][y] = null;
   updateBoard();
+
+  updatePoints(0);
 
   updateHints();
 	dealSpaces();
