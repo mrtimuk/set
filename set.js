@@ -19,6 +19,7 @@ var possibleSets = 0;
 
 var boardWidth = 5;
 var boardHeight = 3;
+var timeAllowed = 80;
 
 // Set up the board with card spaces
 var elBoard = document.getElementById('svgBoard');
@@ -59,12 +60,31 @@ for (var i = 0; i < board.length; i++)
   board[i] = new Array(boardHeight);
 
 // Scoring
-var totalPoints = 0,
-    moveTimer = 0;
-elTotalPoints = document.getElementById("points");
+var totalPoints;
+elTotalPoints = document.getElementById("score");
 function updatePoints(v) {
   totalPoints = v;
-  elTotalPoints.innerHTML = "Points: " + totalPoints;
+  elTotalPoints.innerHTML = zeroPad(totalPoints, 3);
+}
+updatePoints(0);
+
+var nSets;
+var elNSets = document.getElementById('sets');
+function updateNSets(n) {
+  nSets = n;
+  elNSets.innerHTML = zeroPad(nSets, 2);
+}
+updateNSets(0);
+
+var moveTimer = 0;
+var elTimerBar = document.getElementById("moveTimerBar");
+function updateMoveTimer(v) {
+  moveTimer = v;
+  elTimerBar.style.width = ((moveTimer * 100) / timeAllowed) + "%";
+}
+
+function zeroPad(n, w) {
+  return '<font color="#555">' + Array(Math.max(0, w - (n+"").length) + 1).join("0") + '</font>' + n;  
 }
 
 function createClickHandler(x, y) {
@@ -72,9 +92,7 @@ function createClickHandler(x, y) {
 }
 
 var elSet = document.getElementById('elSet');
-var elNSets = document.getElementById('elNSets');
 var elInstructions = document.getElementById('elInstructions');
-var nSets = 0;
 function cardClicked(x,y) {
   if (board[x][y] == null)
     return;
@@ -94,8 +112,7 @@ function cardClicked(x,y) {
   var check = checkCombo(selections);
   if (check.set)
   {
-    nSets++;
-    updateHints();
+    updateNSets(nSets + 1);
     elSet.style.display = 'block';
     
     updatePoints(totalPoints + moveTimer);
@@ -217,17 +234,11 @@ function showHint()
   for (i = 0; i <= hint; i++)
     elPossibleSets.innerHTML += describeCard(sets[0][i])+"<br>";
   if (hint < 2)
-    elPossibleSets.innerHTML += "<a href='#hint' onClick='showHint()'>Show another hint..</a><br>";
+    elPossibleSets.innerHTML += "<a href='#hint' onClick='showHint()'>Another hint (Cost: 100)</a><br>";
   for (; i < 2; i++)
     elPossibleSets.innerHTML += "<br>";
  
   hint++;
-}
-
-var elTimer = document.getElementById("timer");
-function updateMoveTimer(v) {
-  moveTimer = v;
-  elTimer.innerHTML = Array(moveTimer).join("|") + "<br>";
 }
  
 function moveTick() {
@@ -263,8 +274,8 @@ function dealSpaces()
   hint = 0;
   if (sets.length > 0)
   {
-    elPossibleSets.innerHTML += "<a href='#hint' onClick='showHint()'>Show a hint..</a><br><br>";
-    updateMoveTimer(80);
+    elPossibleSets.innerHTML += "<a href='#hint' onClick='showHint()'>Show a hint (Cost: 100)</a><br><br>";
+    updateMoveTimer(timeAllowed);
   }
   moveTick();
 }
@@ -317,22 +328,18 @@ function updateBoard()
 		  drawCard(document.getElementById('c' + j + i), board[j][i]);
 }
 
-function updateHints()
-{
-  elNSets.innerHTML = nSets < 1 ? '<br>' : 
-  'You have ' + nSets + ' set' + (nSets > 1 ? 's' : '') + ' out of 27';
-}
-
 function deal()
 {
 	if (nSets > 0 && possibleSets > 0 &&
 		!confirm("Whoa - are you sure you want to start again?"))
 			return;
 
+  updateMoveTimer(0); // Stops the timer
   elInstructions.innerHTML = "Select 3 cards which form a set";
 
 	selections = [];
-	nSets = 0;
+	updateNSets(0);
+
 	shuffle();
 	for (var x = 0; x < boardWidth; x++)
 		for (var y = 0; y < boardHeight; y++)
@@ -341,12 +348,11 @@ function deal()
 
   updatePoints(0);
 
-  updateHints();
 	dealSpaces();
 
   var elDeal = document.getElementById('elDeal');
   elDeal.innerHTML = "Start again";
-  elDeal.className = "btn btn-danger";
+  elDeal.className = "btn btn-danger pull-right";
 }
 
 shuffle();

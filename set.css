@@ -23,11 +23,35 @@ footer {
     padding-right: 20px;
   }
 }
-#wrap > .container {
-  padding-top: 50px;
+@media (min-width: 980px) {
+  #wrap > .container {
+    padding-top: 50px;
+  }
 }
-
 /* Misc */
+h4 {
+  /*color: green;*/
+  margin-top: 0px;
+}
+.alert {
+  margin-left: 600px;
+}
+.navbar-text {
+  font-size: 140%;
+  font-weight: bold;
+  color: white !important;
+  padding-left: 40px; 
+}
+#score, #sets {
+  text-align: right;
+  padding-left: 2px; 
+}
+#score {
+  width: 50px;
+}
+#sets {
+  width: 40px;
+}
 footer img {
   padding-top: 7px;
   height: 40px;
@@ -38,7 +62,7 @@ svg {
 #elSet {
   display:none;
   position:absolute;
-  width:400px;height:400px;
+  width:600px;height:310px;
   text-align:center;
   padding-top:200px;
   font-size:72pt;

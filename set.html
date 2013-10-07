@@ -14,6 +14,12 @@
     <div class="navbar-inner"> 
       <div class="container"> 
         <a class="brand" href="#">Set</a>
+
+        <p class="navbar-text pull-right" id="score">0</p>
+        <p class="navbar-text pull-right">Your score: </p>
+        <p class="navbar-text pull-right" id="sets">0</p>
+        <p class="navbar-text pull-right">Sets won: </p>
+         
       </div>
     </div>
   </div>
@@ -57,26 +63,29 @@
     </svg>
     <div id="elSet">Set!</div>
 
-    <h2>How to play</h2>
-    <p>Pick three cards which form a set.
-    Each card has a colour, a shape, a number of shapes, and a pattern;
-    for each of these properties all the cards in the set must either be unique or identical.</p>
+    <div class="alert">
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+      <h4>How to play</h4>
+      <p class="howtoplay">Pick three cards which form a set. Each card has colour, shape, 
+      number of shapes, and pattern; for each of these properties all the cards in the set 
+      must either be the same or different.</p>
+      <p class="howtoplay">Finding sets fast wins you more points.</p>
+    </div>
 
-    <p><span id="elInstructions">Deal, then select 3 cards - go!</span></p>
+    <p><span id="elInstructions">Deal, then select three cards - go!</span></p>
 
     <p><span id="elPossibleSets"><br><br><br></span></p>
 
-    <p><span id="elNSets"><br></span></p>
-
-    <p><span id="timer" style="background:green"><br></span></p>
-    <p><span id="points"><br></span></p>
+    Bounty:<div class="progress progress-success">
+      <div id="moveTimerBar"class="bar" style="width: 0%;"></div>
+    </div>
 
     <p><button class="btn btn-large btn-primary" id="elDeal" onclick="return deal();" autofocus>Deal</button></p>
 
     <!-- Affiliate link -->
-    <div style="margin-top:90px">
-    <p><a href="http://www.amazon.co.uk/gp/product/B00000IV34/ref=as_li_tf_tl?ie=UTF8&camp=1634&creative=6738&creativeASIN=B00000IV34&linkCode=as2&tag=valutica-21">
-        <img border="0" src="//ws-eu.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B00000IV34&Format=_SL110_&ID=AsinImage&MarketPlace=GB&ServiceVersion=20070822&WS=1&tag=valutica-21" style="margin-top:-40px; float: left;">Get SET the card game<br>from Amazon</a><img src="//ir-uk.amazon-adsystem.com/e/ir?t=valutica-21&l=as2&o=2&a=B00000IV34" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" /></p>
+    <div style="margin-top:60px">
+    <p><a href="//www.amazon.co.uk/gp/product/B00000IV34/ref=as_li_tf_tl?ie=UTF8&camp=1634&creative=6738&creativeASIN=B00000IV34&linkCode=as2&tag=valutica-21">
+        <img border="0" src="31VQPB1xL-L._SL110_.jpg" style="float: left;">Get SET the card game<br>from Amazon</a><img src="//ir-uk.amazon-adsystem.com/e/ir?t=valutica-21&l=as2&o=2&a=B00000IV34" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" /></p>
     </div>
 
   </div><!-- container -->
