@@ -92,6 +92,14 @@ function createClickHandler(x, y) {
 }
 
 var elSet = document.getElementById('elSet');
+function setModalMessage(title, subtitle) {
+  elSet.innerHTML = title;
+  elSet.style.display = 'block';
+}
+function clearModalMessage() {
+  elSet.style.display = 'none';
+}
+
 var elInstructions = document.getElementById('elInstructions');
 function cardClicked(x,y) {
   if (board[x][y] == null)
@@ -110,16 +118,14 @@ function cardClicked(x,y) {
     "" ) + "<br>";
   
   var check = checkCombo(selections);
-  if (check.set)
-  {
+  if (check.set) {
     updateNSets(nSets + 1);
-    elSet.style.display = 'block';
-    
+    setModalMessage('Set!', "You win " + moveTimer + " points");    
     updatePoints(totalPoints + moveTimer);
     updateMoveTimer(0);
 
     setTimeout(function() {
-      elSet.style.display = 'none';
+      clearModalMessage();
 
       // Remove the set and deal
       for (var x = 0; x < boardWidth; x++)
@@ -135,8 +141,7 @@ function cardClicked(x,y) {
     elInstructions.innerHTML += check.reason;
 }
 
-function uniqueProperty(prop, combo, index)
-{
+function uniqueProperty(prop, combo, index) {
   for (var i = 0; i < index; i++)
     if (combo[i].card[prop] == combo[index].card[prop]) 
       {
@@ -147,26 +152,21 @@ function uniqueProperty(prop, combo, index)
   return true;
 }
 
-function identicalProperty(prop, combo, index)
-{
+function identicalProperty(prop, combo, index) {
   return (combo[0].card[prop] == combo[index].card[prop]);
 }
 
-function checkCombo(combo)
-{
+function checkCombo(combo) {
   if (combo.length < 2) // firstPair reqs len > 1
     return { set:false, reason:'' };
   
   var ret = { set: combo.length == 3, reason:'' };
-  for (var ip = 0; ip < properties.length; ip++)
-  {
+  for (var ip = 0; ip < properties.length; ip++) {
     var prop = properties[ip];
     var firstPair = combo[0].card[prop] == combo[1].card[prop] ? "identical" : "unique";
   
-    for (var is = 2; is < combo.length; is++)
-    {
-      if (!window[firstPair + 'Property'](prop, combo, is))
-      {
+    for (var is = 2; is < combo.length; is++) {
+      if (!window[firstPair + 'Property'](prop, combo, is)) {
         ret.set = false;
         ret.reason += 'The ' + prop + 's are neither unique nor identical<br>';
       }
@@ -175,21 +175,17 @@ function checkCombo(combo)
   return ret;
 }
 
-function countSets()
-{
+function countSets() {
   var setsfound = [];
-  for (var i = 0; i < boardWidth * boardHeight; i++)
-  {
+  for (var i = 0; i < boardWidth * boardHeight; i++) {
     var icard = board[i % boardWidth][Math.floor(i / boardWidth) % (boardHeight)];
     if (icard == null)
       continue;
-    for (var j = i + 1; j < boardWidth * boardHeight; j++)
-    {
+    for (var j = i + 1; j < boardWidth * boardHeight; j++) {
       var jcard = board[j % boardWidth][Math.floor(j / boardWidth) % (boardHeight)];
       if (jcard == null)
         continue;
-      for (var k = j + 1; k < boardWidth * boardHeight; k++)
-      {
+      for (var k = j + 1; k < boardWidth * boardHeight; k++) {
         var kcard = board[k % boardWidth][Math.floor(k / boardWidth) % (boardHeight)];
         if (kcard == null)
           continue;
@@ -202,15 +198,12 @@ function countSets()
   return setsfound;
 }
 
-function describeCard(card)
-{
+function describeCard(card) {
   return (card.number+1) + " " + card.colour  + " " + card.fill + " " + card.shape + (card.number > 0 ? 's' : '');
 }
 
-function shuffle()
-{
-  for (var i = deck.length - 1; i >= 1; i--)
-  {
+function shuffle() {
+  for (var i = deck.length - 1; i >= 1; i--) {
     var j = Math.floor(Math.random() * i);
     var temp = deck[i];
     deck[i] = deck[j];
@@ -222,8 +215,7 @@ function shuffle()
 var elPossibleSets = document.getElementById('elPossibleSets');
 var sets;
 var hint;
-function showHint() 
-{
+function showHint() {
   if (sets.length == 0 || hint > 2)
     return;
 
@@ -251,16 +243,14 @@ function moveTick() {
     setTimeout(moveTick, 500)
 }
 
-function dealSpaces()
-{
+function dealSpaces() {
   elPossibleSets.innerHTML = "<br><br><br>";
   possibleSets = 0;
 
   if (deckPointer < deck.length) 
     for (var i = 0; i < boardHeight; i++)
     	for (var j = 0; j < boardWidth-1; j++)
-    		if (board[j][i] == null)
-        {
+    		if (board[j][i] == null) {
     			board[j][i] = { card: deck[deckPointer++], selected: false };
           setTimeout(function() {
             drawCard(document.getElementById('c' + j + i), board[j][i]);
@@ -272,68 +262,66 @@ function dealSpaces()
   elPossibleSets.innerHTML = "There are " + sets.length + " possible sets in this grid<br>";
 
   hint = 0;
-  if (sets.length > 0)
-  {
+  if (sets.length > 0) {
     elPossibleSets.innerHTML += "<a href='#hint' onClick='showHint()'>Show a hint (Cost: 100)</a><br><br>";
     updateMoveTimer(timeAllowed);
+  } else {
+    setModalMessage('No sets!');
   }
   moveTick();
 }
 
 // Draw card
-function drawCard(svgEl, mdlCard)
-{
-    // Remove previous card
-    while (svgEl.lastChild)
-        svgEl.removeChild(svgEl.lastChild);
+function drawCard(svgEl, mdlCard) {
+  // Remove previous card
+  while (svgEl.lastChild)
+      svgEl.removeChild(svgEl.lastChild);
+
+  if (mdlCard == null) return;
+
+  // Draw outline
+  var svgOutline = document.createElementNS(svgns, 'use');
+  svgOutline.setAttributeNS(xlinkns, "xlink:href", "#card");
+  svgOutline.setAttributeNS(null, "width", 50);
+  svgOutline.setAttributeNS(null, "height", 85);
+  svgOutline.setAttributeNS(null, "fill", 
+      mdlCard.selected ? "khaki" : "white");
+  svgEl.appendChild(svgOutline);
+
+  // Draw shapes
+  var card = mdlCard.card;
+  var top = 32.5 - card.number * 12.5;
+  for (var i = 0; i <= card.number; i++) {
+    var svgSym = document.createElementNS(svgns, 'use');
+    svgSym.setAttributeNS(xlinkns, "xlink:href", "#" + card.shape);
+    svgSym.setAttributeNS(null, "stroke", card.colour);
+    svgSym.setAttributeNS(null, "width", 40);
+    svgSym.setAttributeNS(null, "height", 20);
+    svgSym.setAttributeNS(null, "x", 5);      
+    svgSym.setAttributeNS(null, "y", top + i * 25);
     
-    if (mdlCard == null) return;
+    svgSym.setAttributeNS(null, "fill", 
+      card.fill == "empty" ? "none" :
+      card.fill == "solid" ? card.colour :
+      "url(#" + card.colour + "Hatched)");
 
-    // Draw outline
-    var svgOutline = document.createElementNS(svgns, 'use');
-    svgOutline.setAttributeNS(xlinkns, "xlink:href", "#card");
-    svgOutline.setAttributeNS(null, "width", 50);
-    svgOutline.setAttributeNS(null, "height", 85);
-    svgOutline.setAttributeNS(null, "fill", 
-        mdlCard.selected ? "khaki" : "white");
-    svgEl.appendChild(svgOutline);
-
-    // Draw shapes
-    var card = mdlCard.card;
-    var top = 32.5 - card.number * 12.5;
-    for (var i = 0; i <= card.number; i++)
-    {
-      var svgSym = document.createElementNS(svgns, 'use');
-      svgSym.setAttributeNS(xlinkns, "xlink:href", "#" + card.shape);
-      svgSym.setAttributeNS(null, "stroke", card.colour);
-      svgSym.setAttributeNS(null, "width", 40);
-      svgSym.setAttributeNS(null, "height", 20);
-      svgSym.setAttributeNS(null, "x", 5);      
-      svgSym.setAttributeNS(null, "y", top + i * 25);
-      
-      svgSym.setAttributeNS(null, "fill", 
-        card.fill == "empty" ? "none" :
-        card.fill == "solid" ? card.colour :
-        "url(#" + card.colour + "Hatched)");
-
-      svgEl.appendChild(svgSym);
-    }
+    svgEl.appendChild(svgSym);
+  }
 }
 
 // Redraw board
-function updateBoard()
-{
+function updateBoard() {
   for (var i = 0; i < boardHeight; i++)
   	for (var j = 0; j < boardWidth; j++)
 		  drawCard(document.getElementById('c' + j + i), board[j][i]);
 }
 
-function deal()
-{
+function deal() {
 	if (nSets > 0 && possibleSets > 0 &&
 		!confirm("Whoa - are you sure you want to start again?"))
 			return;
 
+  clearModalMessage();
   updateMoveTimer(0); // Stops the timer
   elInstructions.innerHTML = "Select 3 cards which form a set";
 
@@ -358,9 +346,9 @@ function deal()
 shuffle();
 
 // Googly charts
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-  ga('create', 'UA-43628938-1', 'valutica.co.uk');
-  ga('send', 'pageview');
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-43628938-1', 'valutica.co.uk');
+ga('send', 'pageview');
