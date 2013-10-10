@@ -92,8 +92,11 @@ function createClickHandler(x, y) {
 }
 
 var elSet = document.getElementById('elSet');
-function setModalMessage(title, subtitle) {
-  elSet.innerHTML = title;
+var elModalTitle = document.getElementById('modalTitle');
+var elModalSubTitle = document.getElementById('modalSubTitle');
+function setModalMessage(title,subtitle) {
+  elModalTitle.innerHTML = title;
+  elModalSubTitle.innerHTML = subtitle;
   elSet.style.display = 'block';
 }
 function clearModalMessage() {
@@ -120,7 +123,7 @@ function cardClicked(x,y) {
   var check = checkCombo(selections);
   if (check.set) {
     updateNSets(nSets + 1);
-    setModalMessage('Set!', "You win " + moveTimer + " points");    
+    setModalMessage("Set!",  moveTimer > 0 ? "You win " + moveTimer + " points" : "");    
     updatePoints(totalPoints + moveTimer);
     updateMoveTimer(0);
 
@@ -143,8 +146,7 @@ function cardClicked(x,y) {
 
 function uniqueProperty(prop, combo, index) {
   for (var i = 0; i < index; i++)
-    if (combo[i].card[prop] == combo[index].card[prop]) 
-      {
+    if (combo[i].card[prop] == combo[index].card[prop]) {
         //alert ('Card ' + (index+1) + '('+ combo[index].card[prop] +') is the same as card ' + 
         //  (i+1) + '(' + combo[i].card[prop] + ')');
         return false;
@@ -266,7 +268,7 @@ function dealSpaces() {
     elPossibleSets.innerHTML += "<a href='#hint' onClick='showHint()'>Show a hint (Cost: 100)</a><br><br>";
     updateMoveTimer(timeAllowed);
   } else {
-    setModalMessage('No sets!');
+    setModalMessage('No sets!', "Your score: " + totalPoints);
   }
   moveTick();
 }
