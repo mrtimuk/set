@@ -1,5 +1,4 @@
 /*
-
 model:
 game
   board
@@ -10,36 +9,36 @@ game
 view:
   board-svg
   hints
-
 */
 
 var svgns = "http://www.w3.org/2000/svg";
 var xlinkns = "http://www.w3.org/1999/xlink";
 var possibleSets = 0;
 
-var boardWidth = 5;
+var boardWidth = 6;
 var boardHeight = 3;
+var minCards = 12;
 var timeAllowed = 80;
-
-// Set up the board with card spaces
-var elBoard = document.getElementById('svgBoard');
-for (var i = 0; i < boardHeight; i++)
-	for (var j = 0; j < boardWidth; j++)
-	{
-    var elCard = document.createElementNS(svgns, 'g');
-    elCard.id = 'c' + j + i;
-    elCard.setAttributeNS(null, "transform", "translate(" + (j * 50) + " " + (i * 85) + ")");
-    
-	elCard.addEventListener('click', createClickHandler(j,i), false);
-    elCard.addEventListener('touchend', createClickHandler(j,i), false);
-	elBoard.appendChild(elCard);
-	}
 
 var colours = ['red', 'green', 'blue'];
 var shapes = ['wotsit', 'sausage', 'diamond'];
 var fills = ['empty', 'hatched', 'solid'];
 var maxNumber = 3;
 var properties = ['colour', 'shape', 'number', 'fill'];
+
+// Set up the board with card spaces
+var elBoard = document.getElementById('svgBoard');
+for (var i = 0; i < boardHeight; i++)
+  for (var j = 0; j < boardWidth; j++)
+  {
+    var elCard = document.createElementNS(svgns, 'g');
+    elCard.id = 'c' + j + i;
+    elCard.setAttributeNS(null, "transform", "translate(" + (j * 50) + " " + (i * 85) + ")");
+    
+  elCard.addEventListener('click', createClickHandler(j,i), false);
+    elCard.addEventListener('touchend', createClickHandler(j,i), false);
+  elBoard.appendChild(elCard);
+  }
 
 // Create the deck: 3 shapes, 3 colours, 3 numbers, 3 gradents = 81 cards
 var deck = new Array(maxNumber * fills.length * shapes.length * colours.length);
@@ -103,6 +102,7 @@ function clearModalMessage() {
   elSet.style.display = 'none';
 }
 
+var cardsDealt = 0;
 var elInstructions = document.getElementById('elInstructions');
 function cardClicked(x,y) {
   if (board[x][y] == null)
@@ -133,11 +133,17 @@ function cardClicked(x,y) {
       // Remove the set and deal
       for (var x = 0; x < boardWidth; x++)
         for (var y = 0; y < boardHeight; y++)
-          if (board[x][y] != null && board[x][y].selected)
+          if (board[x][y] != null && board[x][y].selected) {
             board[x][y] = null;
+            cardsDealt--;
+          }
       selections = [];
-      dealSpaces();
       updateBoard();
+
+      if (cardsDealt < minCards || countSets() == 0)
+        dealSpaces(3);
+      else
+        play();
     }, 1000);
   }
   else 
@@ -216,23 +222,23 @@ function shuffle() {
 
 var elPossibleSets = document.getElementById('elPossibleSets');
 var sets;
-var hint;
+var hintsShown;
 function showHint() {
-  if (sets.length == 0 || hint > 2)
+  if (sets.length == 0 || hintsShown > 2)
     return;
 
   updatePoints(totalPoints - 100); 
 
   elPossibleSets.innerHTML="";
   var i;
-  for (i = 0; i <= hint; i++)
+  for (i = 0; i <= hintsShown; i++)
     elPossibleSets.innerHTML += describeCard(sets[0][i])+"<br>";
-  if (hint < 2)
+  if (hintsShown < 2)
     elPossibleSets.innerHTML += "<a href='#hint' onClick='showHint()'>Another hint (Cost: 100)</a><br>";
   for (; i < 2; i++)
     elPossibleSets.innerHTML += "<br>";
  
-  hint++;
+  hintsShown++;
 }
  
 function moveTick() {
@@ -245,30 +251,38 @@ function moveTick() {
     setTimeout(moveTick, 500)
 }
 
-function dealSpaces() {
+function dealSpaces(n) {
   elPossibleSets.innerHTML = "<br><br><br>";
   possibleSets = 0;
 
-  if (deckPointer < deck.length) 
-    for (var i = 0; i < boardHeight; i++)
-    	for (var j = 0; j < boardWidth-1; j++)
+  if (deckPointer < deck.length && n > 0) 
+    for (var j = 0; j < boardWidth; j++)
+      for (var i = 0; i < boardHeight; i++)
     		if (board[j][i] == null) {
     			board[j][i] = { card: deck[deckPointer++], selected: false };
+          cardsDealt++;
           setTimeout(function() {
             drawCard(document.getElementById('c' + j + i), board[j][i]);
-            dealSpaces();
-          }, 80);
+            dealSpaces(n - 1);
+          }, 100);
           return;
         }
+  play();
+}
+
+function play()
+{
   sets = countSets();
   elPossibleSets.innerHTML = "There are " + sets.length + " possible sets in this grid<br>";
 
-  hint = 0;
+  hintsShown = 0;
   if (sets.length > 0) {
     elPossibleSets.innerHTML += "<a href='#hint' onClick='showHint()'>Show a hint (Cost: 100)</a><br><br>";
     updateMoveTimer(timeAllowed);
+  } else if (deckPointer < deck.length) {
+    dealSpaces(3);
   } else {
-    setModalMessage('No sets!', "Your score: " + totalPoints);
+    setModalMessage('Game over!', "Your score: " + totalPoints);
   }
   moveTick();
 }
@@ -334,11 +348,12 @@ function deal() {
 	for (var x = 0; x < boardWidth; x++)
 		for (var y = 0; y < boardHeight; y++)
 			board[x][y] = null;
+  cardsDealt = 0;
   updateBoard();
 
   updatePoints(0);
 
-	dealSpaces();
+	dealSpaces(minCards);
 
   var elDeal = document.getElementById('elDeal');
   elDeal.innerHTML = "Start again";
